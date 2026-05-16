@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>软件著作权申请材料生成工具</title>
+    <style>
+        /* 全局重置样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 页面主体样式 */
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* 容器样式 */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* 头部样式 */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* 表单容器样式 */
+        .form-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        /* 表单步骤样式 */
+        .form-step {
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-step:last-child {
+            border-bottom: none;
+        }
+
+        /* 步骤标题样式 */
+        .step-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
+
+        .step-title h2 {
+            font-size: 1.4rem;
+            color: #2c3e50;
+        }
+
+        /* 表单网格布局 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* 表单组样式 */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group .hint {
+            font-size: 0.8rem;
+            color: #95a5a6;
+            margin-top: 6px;
+        }
+
+        /* 文件上传区域样式 */
+        .file-upload {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .file-upload:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .file-upload i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .file-upload span {
+            color: #34495e;
+            font-weight: 500;
+        }
+
+        .file-upload small {
+            color: #95a5a6;
+            display: block;
+            margin-top: 8px;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        /* 按钮组样式 */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .btn {
+            padding: 14px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #bdbdbd;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* 进度条容器样式 */
+        .progress-container {
+            display: none;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        /* 结果容器样式 */
+        .result-container {
+            display: none;
+            padding: 30px;
+        }
+
+        .result-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .result-title h3 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .result-title p {
+            color: #7f8c8d;
+        }
+
+        /* 文档列表样式 */
+        .document-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .document-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .document-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .document-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .document-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .document-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-download {
+            padding: 8px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-download:hover {
+            background: #5a6fd6;
+        }
+
+        .btn-preview {
+            padding: 8px 20px;
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-preview:hover {
+            background: #bdbdbd;
+        }
+
+        /* 弹窗遮罩样式 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h4 {
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #e0e0e0;
+        }
+
+        .modal-body {
+            padding: 30px;
+            max-height: calc(80vh - 100px);
+            overflow-y: auto;
+        }
+
+        /* 预览内容样式 */
+        .preview-content {
+            white-space: pre-wrap;
+            font-family: "Courier New", monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+
+        .preview-content h1,
+        .preview-content h2,
+        .preview-content h3 {
+            font-family: "Microsoft YaHei", sans-serif;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .preview-content h1 { font-size: 1.5rem; color: #2c3e50; }
+        .preview-content h2 { font-size: 1.3rem; color: #34495e; }
+        .preview-content h3 { font-size: 1.1rem; color: #7f8c8d; }
+
+        .preview-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .preview-content th,
+        .preview-content td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .preview-content th {
+            background: #667eea;
+            color: white;
+        }
+
+        .preview-content ul,
+        .preview-content ol {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        /* 错误消息样式 */
+        .error-message {
+            background: #ffebee;
+            border-left: 4px solid #e53935;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+            color: #c62828;
+            display: none;
+        }
+
+        /* 成功消息样式 */
+        .success-message {
+            background: #e8f5e9;
+            border-left: 4px solid #43a047;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+            color: #2e7d32;
+        }
+
+        /* 移动端响应式样式 */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .form-step {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .document-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 页面头部 -->
+        <div class="header">
+            <h1>📝 软件著作权申请材料生成工具</h1>
+            <p>快速生成符合中国版权保护中心要求的申请材料</p>
+        </div>
+
+        <!-- 表单容器 -->
+        <div class="form-container">
+            <!-- 步骤一：项目信息 -->
+            <div class="form-step">
+                <div class="step-title">
+                    <div class="step-number">1</div>
+                    <h2>项目信息</h2>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="projectPath">项目路径</label>
+                        <input type="text" id="projectPath" placeholder="/path/to/your/project">
+                        <span class="hint">请输入本地项目路径或上传项目文件</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="outputPath">输出目录</label>
+                        <input type="text" id="outputPath" placeholder="默认: copyright-application-materials">
+                        <span class="hint">生成文档的保存位置</span>
+                    </div>
+                </div>
+                <div class="file-upload" id="fileUpload">
+                    <i>📁</i>
+                    <span>点击或拖拽上传项目文件</span>
+                    <small>支持 ZIP、RAR 等压缩包格式</small>
+                    <input type="file" id="fileInput" multiple webkitdirectory directory>
+                </div>
+            </div>
+
+            <!-- 步骤二：著作权人信息 -->
+            <div class="form-step">
+                <div class="step-title">
+                    <div class="step-number">2</div>
+                    <h2>著作权人信息</h2>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="ownerName">著作权人名称 *</label>
+                        <input type="text" id="ownerName" placeholder="个人姓名或公司全称" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="idType">证件类型 *</label>
+                        <select id="idType">
+                            <option value="身份证">身份证</option>
+                            <option value="营业执照">营业执照</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="idNumber">证件号码</label>
+                        <input type="text" id="idNumber" placeholder="请输入证件号码">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">联系地址</label>
+                        <input type="text" id="address" placeholder="详细联系地址">
+                    </div>
+                    <div class="form-group">
+                        <label for="zipCode">邮政编码</label>
+                        <input type="text" id="zipCode" placeholder="邮政编码">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact">联系人</label>
+                        <input type="text" id="contact" placeholder="联系人姓名">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">联系电话</label>
+                        <input type="tel" id="phone" placeholder="联系电话">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">电子邮箱</label>
+                        <input type="email" id="email" placeholder="电子邮箱">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 步骤三：软件信息 -->
+            <div class="form-step">
+                <div class="step-title">
+                    <div class="step-number">3</div>
+                    <h2>软件信息</h2>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="softwareType">软件类型 *</label>
+                        <select id="softwareType">
+                            <option value="小程序">小程序</option>
+                            <option value="APP">APP</option>
+                            <option value="Web应用">Web应用</option>
+                            <option value="游戏软件">游戏软件</option>
+                            <option value="教育软件">教育软件</option>
+                            <option value="金融软件">金融软件</option>
+                            <option value="人工智能软件">人工智能软件</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="devPurpose">开发目的</label>
+                        <input type="text" id="devPurpose" placeholder="限50字，简要说明开发目的">
+                        <span class="hint">限50字</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="industry">面向领域/行业</label>
+                        <input type="text" id="industry" placeholder="限50字，说明主要应用领域">
+                        <span class="hint">限50字</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="mainFunctions">软件的主要功能</label>
+                        <textarea id="mainFunctions" placeholder="限200字，清晰描述核心功能"></textarea>
+                        <span class="hint">限200字</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="techFeatures">技术特点</label>
+                        <textarea id="techFeatures" placeholder="限100字，描述技术创新和优势"></textarea>
+                        <span class="hint">限100字</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 按钮组 -->
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="resetForm()">重置</button>
+                <button class="btn btn-primary" onclick="generateDocs()" id="generateBtn">生成文档</button>
+            </div>
+
+            <!-- 进度条容器 -->
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">正在生成文档...</div>
+            </div>
+
+            <!-- 结果容器 -->
+            <div class="result-container" id="resultContainer">
+                <div class="result-title">
+                    <h3>✅ 文档生成成功！</h3>
+                    <p>以下是生成的申请材料，点击下载或预览</p>
+                </div>
+                <div class="document-list" id="documentList">
+                    <!-- 申请表 -->
+                    <div class="document-card">
+                        <div class="document-icon">📄</div>
+                        <div class="document-name">软件著作权登记申请表</div>
+                        <div class="document-actions">
+                            <button class="btn-preview" onclick="previewDoc('application')">预览</button>
+                            <button class="btn-download" onclick="downloadDoc('application')">下载</button>
+                        </div>
+                    </div>
+                    <!-- 源代码文档 -->
+                    <div class="document-card">
+                        <div class="document-icon">📝</div>
+                        <div class="document-name">源代码文档</div>
+                        <div class="document-actions">
+                            <button class="btn-preview" onclick="previewDoc('source')">预览</button>
+                            <button class="btn-download" onclick="downloadDoc('source')">下载</button>
+                        </div>
+                    </div>
+                    <!-- 用户手册 -->
+                    <div class="document-card">
+                        <div class="document-icon">📘</div>
+                        <div class="document-name">用户手册</div>
+                        <div class="document-actions">
+                            <button class="btn-preview" onclick="previewDoc('manual')">预览</button>
+                            <button class="btn-download" onclick="downloadDoc('manual')">下载</button>
+                        </div>
+                    </div>
+                    <!-- 设计说明书 -->
+                    <div class="document-card">
+                        <div class="document-icon">📗</div>
+                        <div class="document-name">设计说明书</div>
+                        <div class="document-actions">
+                            <button class="btn-preview" onclick="previewDoc('design')">预览</button>
+                            <button class="btn-download" onclick="downloadDoc('design')">下载</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 弹窗遮罩 -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="modalTitle">文档预览</h4>
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="preview-content" id="previewContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 存储生成的文档内容
+        let generatedDocs = {};
+
+        /**
+         * 生成文档函数
+         * 1. 验证表单数据
+         * 2. 显示进度条
+         * 3. 生成模拟文档
+         * 4. 显示结果
+         */
+        function generateDocs() {
+            // 获取著作权人名称并验证
+            const ownerName = document.getElementById('ownerName').value.trim();
+            if (!ownerName) {
+                alert('请填写著作权人名称');
+                return;
+            }
+
+            // 禁用生成按钮，隐藏表单，显示进度条
+            document.getElementById('generateBtn').disabled = true;
+            document.querySelector('.form-container').style.display = 'none';
+            document.getElementById('progressContainer').style.display = 'block';
+
+            // 获取进度条元素
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            // 模拟进度条动画
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 90) progress = 90;
+                progressFill.style.width = progress + '%';
+                progressText.textContent = `正在生成文档... ${Math.round(progress)}%`;
+            }, 300);
+
+            // 模拟文档生成过程
+            setTimeout(() => {
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                progressText.textContent = '文档生成完成！';
+
+                // 生成模拟文档内容
+                generateMockDocs();
+
+                // 延迟显示结果
+                setTimeout(() => {
+                    document.getElementById('progressContainer').style.display = 'none';
+                    document.getElementById('resultContainer').style.display = 'block';
+                }, 500);
+            }, 2000);
+        }
+
+        /**
+         * 生成模拟文档内容
+         * 根据用户输入的信息生成四份申请材料
+         */
+        function generateMockDocs() {
+            // 获取用户输入的表单数据
+            const ownerName = document.getElementById('ownerName').value.trim();
+            const idType = document.getElementById('idType').value;
+            const softwareType = document.getElementById('softwareType').value;
+            const devPurpose = document.getElementById('devPurpose').value || '未填写';
+            const industry = document.getElementById('industry').value || '未填写';
+            const mainFunctions = document.getElementById('mainFunctions').value || '未填写';
+            const techFeatures = document.getElementById('techFeatures').value || '未填写';
+
+            // 获取当前日期
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            // 生成软件著作权登记申请表
+            generatedDocs['application'] = `# 软件著作权登记申请表
+
+**著作权人：${ownerName}**
+
+## 基本信息
+
+| 字段 | 内容 |
+|------|------|
+| 软件全称 | 示例软件 |
+| 软件简称 | 示例软件 |
+| 版本号 | V1.0 |
+| 开发完成日期 | ${currentDate} |
+| 首次发表日期 | ${currentDate} |
+
+## 著作权人信息
+
+| 字段 | 内容 |
+|------|------|
+| 著作权人 | ${ownerName} |
+| 证件类型 | ${idType} |
+| 证件号码 | （请填写） |
+| 地址 | （请填写） |
+| 邮编 | （请填写） |
+| 联系人 | （请填写） |
+| 电话 | （请填写） |
+| 邮箱 | （请填写） |
+
+## 开发者信息
+
+| 字段 | 内容 |
+|------|------|
+| 开发者 | ${ownerName} |
+| 证件类型 | ${idType} |
+| 证件号码 | （请填写） |
+| 地址 | （请填写） |
+| 邮编 | （请填写） |
+| 联系人 | （请填写） |
+| 电话 | （请填写） |
+| 邮箱 | （请填写） |
+
+## 软件信息
+
+| 字段 | 内容 |
+|------|------|
+| 软件性质 | 原创 |
+| 软件分类 | 移动应用软件-${softwareType === '小程序' ? '小程序' : 'APP'} |
+| 代码行数 | 15000 |
+| 开发环境 | Visual Studio Code |
+| 运行环境 | ${softwareType === '小程序' ? '微信客户端' : 'iOS/Android'} |
+| 编程语言 | JavaScript, TypeScript |
+| 硬件要求 | 智能手机 |
+
+## 软硬件环境信息
+
+| 字段 | 内容 |
+|------|------|
+| 开发的硬件环境 | Intel i7-12700H, 16GB RAM |
+| 运行的硬件环境 | Intel i5 或同等性能CPU, 4GB内存 |
+| 开发该软件的操作系统 | Windows 11 / macOS Monterey |
+| 软件开发环境/开发工具 | Visual Studio Code 1.74 |
+| 该软件的运行平台/操作系统 | ${softwareType === '小程序' ? '微信客户端' : 'iOS 15.0+/Android 10.0+'} |
+| 软件运行支撑环境/支持软件 | ${softwareType === '小程序' ? '微信小程序基础库' : 'Node.js 18.x'} |
+
+## 软件技术信息
+
+| 字段 | 内容 |
+|------|------|
+| 编程语言 | JavaScript, TypeScript |
+| 源程序量 | 15000行 |
+| 开发目的 | ${devPurpose} |
+| 面向领域/行业 | ${industry} |
+| 软件的主要功能 | ${mainFunctions} |
+| 软件的技术特点 | 【${softwareType}】${techFeatures} |
+
+## 软件功能简介
+
+- 提供便捷的用户操作体验
+- 支持多种功能模块
+- 数据安全可靠
+- 用户界面友好
+
+## 备注
+
+本软件为原创开发，未使用第三方商业代码。`;
+
+            // 生成源代码文档
+            generatedDocs['source'] = `# 示例软件 源代码文档
+
+**著作权人：${ownerName}**
+
+软件名称：示例软件
+版本号：V1.0
+生成日期：${currentDate}
+
+---
+
+## 前30页（核心业务逻辑）
+
+## 文件：app.js
+总行数：150行
+
+\`\`\`javascript
+// 应用入口文件
+const express = require('express');
+const app = express();
+
+// 中间件配置
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// 路由配置
+app.use('/api', require('./routes'));
+
+// 错误处理
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Internal Server Error' });
+});
+
+// 启动服务器
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(\`Server running on port \${PORT}\`);
+});
+\`\`\`
+
+--- 第 1 页 ---
+
+## 文件：utils/helpers.js
+总行数：80行
+
+\`\`\`javascript
+// 工具函数库
+
+/**
+ * 格式化日期
+ * @param {Date} date - 日期对象
+ * @returns {string} 格式化后的日期字符串
+ */
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return \`\${year}-\${month}-\${day}\`;
+}
+
+/**
+ * 生成唯一ID
+ * @returns {string} 唯一ID
+ */
+function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+module.exports = {
+    formatDate,
+    generateId
+};
+\`\`\`
+
+--- 第 2 页 ---
+
+## 文件：controllers/userController.js
+总行数：120行
+
+\`\`\`javascript
+// 用户控制器
+const User = require('../models/User');
+
+/**
+ * 获取用户列表
+ */
+async function getUsers(req, res) {
+    try {
+        const users = await User.find();
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+/**
+ * 创建用户
+ */
+async function createUser(req, res) {
+    try {
+        const user = new User(req.body);
+        await user.save();
+        res.status(201).json(user);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
+
+module.exports = {
+    getUsers,
+    createUser
+};
+\`\`\`
+
+--- 第 3 页 ---`;
+
+            // 生成用户手册
+            generatedDocs['manual'] = `# 示例软件 用户手册
+
+**著作权人：${ownerName}**
+
+## 一、软件简介
+
+本软件是一款${softwareType}，为用户提供便捷的服务体验。
+
+### 1.1 软件概述
+
+示例软件是一款功能强大的${softwareType}，运行于${softwareType === '小程序' ? '微信小程序平台' : '移动设备'}。
+
+### 1.2 主要特点
+
+- 简洁易用的用户界面
+- 稳定可靠的性能
+- 丰富的功能模块
+- 良好的用户体验
+
+## 二、功能概述
+
+### 2.1 功能列表
+
+1. 用户注册与登录
+2. 数据管理
+3. 信息查询
+4. 数据导出
+5. 系统设置
+
+### 2.2 适用场景
+
+本软件适用于${industry}领域，为用户提供专业的解决方案。
+
+## 三、安装/使用说明
+
+### 3.1 系统要求
+
+- 平台：${softwareType === '小程序' ? '微信客户端' : 'iOS/Android'}
+- 技术栈：JavaScript, TypeScript
+
+### 3.2 使用说明
+
+${softwareType === '小程序' ? `
+1. 打开微信客户端
+2. 搜索或扫描小程序二维码
+3. 进入小程序开始使用
+` : `
+1. 下载并安装应用程序
+2. 启动应用程序
+3. 按照界面提示开始使用
+`}
+
+## 四、主要功能说明
+
+### 4.1 用户注册与登录
+
+该功能提供了便捷的用户注册和登录体验。
+
+**操作步骤：**
+1. 点击注册/登录按钮
+2. 输入用户名和密码
+3. 完成验证
+4. 进入系统
+
+## 五、操作步骤
+
+### 5.1 基本操作
+
+1. 启动软件
+2. 完成必要的初始化设置
+3. 根据需求选择相应功能
+4. 按照界面提示完成操作
+
+### 5.2 高级操作
+
+1. 进入高级设置界面
+2. 自定义配置参数
+3. 保存设置
+
+## 六、注意事项
+
+1. 请确保网络连接正常
+2. 首次使用可能需要授权
+3. 数据保存在本地，清除缓存会丢失数据
+4. 请定期备份重要数据
+
+## 七、常见问题
+
+### 7.1 无法打开应用
+
+- 检查网络连接是否正常
+- 确认应用是否已正确安装
+- 尝试重启应用或设备
+
+### 7.2 数据加载失败
+
+- 检查网络连接
+- 清除应用缓存后重试
+- 更新应用到最新版本
+
+## 八、技术支持
+
+### 8.1 版本信息
+
+- 软件版本：V1.0
+- 更新日期：${currentDate}
+- 著作权人：${ownerName}`;
+
+            // 生成设计说明书
+            generatedDocs['design'] = `# 示例软件 设计说明书
+
+**著作权人：${ownerName}**
+
+## 一、软件概述
+
+### 1.1 软件简介
+
+本软件是一款${softwareType}，为用户提供便捷的服务体验。
+
+### 1.2 开发背景
+
+${devPurpose}，开发了示例软件。
+
+### 1.3 设计目标
+
+- 提供简洁易用的用户界面
+- 实现稳定可靠的功能
+- 优化用户体验
+- 确保数据安全
+
+## 二、需求分析
+
+### 2.1 功能需求
+
+1. 用户注册与登录
+2. 数据管理
+3. 信息查询
+4. 数据导出
+5. 系统设置
+
+### 2.2 行业领域
+
+本软件主要面向${industry}领域。
+
+### 2.3 性能需求
+
+- 响应时间：操作响应时间小于500ms
+- 并发支持：支持多用户同时使用
+- 资源占用：内存占用合理
+- 稳定性：运行稳定，无崩溃
+
+### 2.4 安全需求
+
+- 数据加密：敏感数据加密存储
+- 权限控制：合理的权限管理
+- 防护措施：防止常见安全漏洞
+
+## 三、总体设计
+
+### 3.1 系统架构
+
+本软件采用${softwareType}架构，基于JavaScript、TypeScript开发。
+
+### 3.2 模块划分
+
+软件主要包含以下模块：
+
+- 主界面模块：负责用户界面的展示和交互
+- 业务逻辑模块：处理核心业务逻辑
+- 数据存储模块：负责数据的存储和管理
+- 工具模块：提供通用工具函数
+- 网络通信模块：处理与服务器的数据交互
+
+### 3.3 技术选型
+
+- JavaScript
+- TypeScript
+- Node.js
+
+### 3.4 运行环境
+
+- 平台：${softwareType === '小程序' ? '微信小程序平台' : 'iOS/Android'}
+- 基础库版本：最新
+- 硬件要求：智能手机
+
+## 四、详细设计
+
+### 4.1 主界面模块
+
+#### 4.1.1 模块功能
+
+负责软件主界面的展示和用户交互。
+
+#### 4.1.2 模块接口
+
+- 页面路由接口
+- 事件处理接口
+- 生命周期管理接口
+
+### 4.2 业务逻辑模块
+
+#### 4.2.1 模块功能
+
+处理软件的核心业务逻辑。
+
+#### 4.2.2 模块接口
+
+- 数据处理接口
+- 计算接口
+- 业务规则验证接口
+
+### 4.3 数据存储模块
+
+#### 4.3.1 模块功能
+
+负责数据的持久化存储。
+
+#### 4.3.2 数据存储方式
+
+- 本地存储：使用本地缓存存储用户配置
+- 数据格式：JSON格式
+
+## 五、数据结构设计
+
+### 5.1 数据存储
+
+使用本地存储保存用户数据。
+
+### 5.2 数据格式
+
+- JSON格式存储配置信息
+- 数组格式存储历史记录
+- 键值对形式存储用户偏好设置
+
+### 5.3 数据关系
+
+- 用户信息与使用记录一一对应
+- 配置信息独立存储
+- 缓存数据定期清理
+
+## 六、接口设计
+
+### 6.1 内部接口
+
+- 模块间通信接口
+- 数据传递接口
+
+### 6.2 外部接口
+
+- API调用接口
+- 数据上报接口
+
+## 七、算法设计
+
+### 7.1 核心算法
+
+- 数据处理算法
+- 排序算法
+- 搜索算法
+
+### 7.2 算法流程
+
+1. 数据采集
+2. 数据处理
+3. 结果输出
+
+## 八、界面设计
+
+### 8.1 界面布局
+
+采用响应式布局，适配不同屏幕尺寸。
+
+### 8.2 交互设计
+
+- 点击交互：按钮点击触发相应功能
+- 手势交互：支持滑动等手势操作
+- 表单交互：用户输入数据的交互
+
+### 8.3 界面元素
+
+- 按钮：触发功能操作
+- 输入框：接收用户输入
+- 列表：展示数据列表
+- 弹窗：提示信息或确认操作
+
+## 九、安全设计
+
+### 9.1 安全机制
+
+- 输入验证：对用户输入进行验证
+- 错误处理：完善的错误处理机制
+- 异常捕获：防止程序崩溃
+
+### 9.2 数据保护
+
+- 敏感数据加密存储
+- 重要操作需要确认
+- 数据备份机制
+
+## 十、测试设计
+
+### 10.1 测试策略
+
+- 单元测试：测试各个功能模块
+- 集成测试：测试模块间的交互
+- 用户测试：真实用户使用测试
+- 压力测试：验证系统稳定性
+
+### 10.2 测试用例
+
+- 功能测试用例
+- 界面测试用例
+- 性能测试用例
+- 安全测试用例
+
+### 10.3 测试环境
+
+- 开发工具：Visual Studio Code
+- 操作系统：Windows 11
+- 硬件环境：Intel i7-12700H, 16GB RAM`;
+        }
+
+        /**
+         * 预览文档函数
+         * @param {string} docType - 文档类型
+         */
+        function previewDoc(docType) {
+            // 文档类型名称映射
+            const docNames = {
+                'application': '软件著作权登记申请表',
+                'source': '源代码文档',
+                'manual': '用户手册',
+                'design': '设计说明书'
+            };
+
+            // 设置弹窗标题
+            document.getElementById('modalTitle').textContent = docNames[docType];
+            // 转换Markdown为HTML并显示
+            document.getElementById('previewContent').innerHTML = markdownToHtml(generatedDocs[docType]);
+            // 显示弹窗
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        /**
+         * Markdown转HTML函数
+         * @param {string} markdown - Markdown文本
+         * @returns {string} HTML文本
+         */
+        function markdownToHtml(markdown) {
+            return markdown
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')      // 三级标题
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')        // 二级标题
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')         // 一级标题
+                .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>') // 加粗
+                .replace(/\*(.*)\*/gim, '<em>$1</em>')           // 斜体
+                .replace(/^- (.*$)/gim, '<li>$1</li>')           // 无序列表
+                .replace(/^\d+\. (.*$)/gim, '<li>$1</li>')       // 有序列表
+                .replace(/```(\w+)?\n([\s\S]*?)```/gim, '<pre><code>$2</code></pre>') // 代码块
+                .replace(/`([^`]+)`/gim, '<code>$1</code>')       // 行内代码
+                .replace(/^\|(.+)\|\n\|[-|]+\|\n((?:\|.+\|\n?)+)/gim, (match, header, body) => {
+                    // 表格转换
+                    const headerCells = header.split('|').filter(cell => cell.trim());
+                    const bodyRows = body.trim().split('\n');
+                    let html = '<table><thead><tr>';
+                    headerCells.forEach(cell => {
+                        html += `<th>${cell.trim()}</th>`;
+                    });
+                    html += '</tr></thead><tbody>';
+                    bodyRows.forEach(row => {
+                        const cells = row.split('|').filter(cell => cell.trim());
+                        html += '<tr>';
+                        cells.forEach(cell => {
+                            html += `<td>${cell.trim()}</td>`;
+                        });
+                        html += '</tr>';
+                    });
+                    html += '</tbody></table>';
+                    return html;
+                })
+                .replace(/---\n/gim, '<hr>')                   // 分割线
+                .replace(/\n/gim, '<br>');                    // 换行
+        }
+
+        /**
+         * 下载文档函数
+         * @param {string} docType - 文档类型
+         */
+        function downloadDoc(docType) {
+            // 文档类型名称映射
+            const docNames = {
+                'application': '软件著作权登记申请表',
+                'source': '源代码文档',
+                'manual': '用户手册',
+                'design': '设计说明书'
+            };
+
+            // 创建Blob对象
+            const blob = new Blob([generatedDocs[docType]], { type: 'text/markdown;charset=utf-8' });
+            // 创建下载链接
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${docNames[docType]}.md`;
+            // 触发下载
+            document.body.appendChild(a);
+            a.click();
+            // 清理
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        /**
+         * 关闭弹窗函数
+         */
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+
+        /**
+         * 重置表单函数
+         */
+        function resetForm() {
+            // 重置所有表单字段
+            document.getElementById('ownerName').value = '';
+            document.getElementById('idType').value = '身份证';
+            document.getElementById('idNumber').value = '';
+            document.getElementById('address').value = '';
+            document.getElementById('zipCode').value = '';
+            document.getElementById('contact').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('softwareType').value = '小程序';
+            document.getElementById('devPurpose').value = '';
+            document.getElementById('industry').value = '';
+            document.getElementById('mainFunctions').value = '';
+            document.getElementById('techFeatures').value = '';
+            document.getElementById('projectPath').value = '';
+            document.getElementById('outputPath').value = '';
+
+            // 重置界面状态
+            document.getElementById('generateBtn').disabled = false;
+            document.querySelector('.form-container').style.display = 'block';
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('resultContainer').style.display = 'none';
+        }
+
+        // 文件上传区域点击事件
+        document.getElementById('fileUpload').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        // 文件选择变化事件
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const files = e.target.files;
+            if (files.length > 0) {
+                document.getElementById('projectPath').value = files[0].webkitRelativePath ? 
+                    files[0].webkitRelativePath.split('/')[0] : 
+                    files[0].name;
+            }
+        });
+
+        // 点击弹窗遮罩关闭弹窗
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modalOverlay')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

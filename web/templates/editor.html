@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文档编辑器 - 软件著作权申请材料生成系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 顶部导航 */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .navbar-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-success {
+            background: #43a047;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #388e3c;
+        }
+
+        /* 主容器 */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* 左侧文件浏览器 */
+        .file-browser {
+            width: 300px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .file-browser-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+        }
+
+        .file-browser-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            flex: 1;
+        }
+
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .file-item {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .file-item:hover {
+            background: #f0f4ff;
+        }
+
+        .file-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .file-item.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .file-item.active.selected {
+            background: #667eea;
+        }
+
+        .file-checkbox {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .file-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .file-meta {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            background: white;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 24px;
+            background: #e0e0e0;
+            margin: 0 10px;
+        }
+
+        /* 编辑区域 */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .editor-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .editor-pane {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-textarea {
+            width: 100%;
+            flex: 1;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: "Courier New", monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: none;
+            transition: all 0.3s ease;
+        }
+
+        .editor-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .preview-pane {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-left: 1px solid #e0e0e0;
+            overflow-y: auto;
+        }
+
+        .preview-header {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .preview-content {
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .preview-content h1 {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin: 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .preview-content h2 {
+            font-size: 1.5rem;
+            color: #34495e;
+            margin: 20px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .preview-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .preview-content th,
+        .preview-content td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .preview-content th {
+            background: #667eea;
+            color: white;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #e0e0e0;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* 导出选项 */
+        .export-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .export-option {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .export-option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .export-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .export-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        /* 提示信息 */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            background: #43a047;
+        }
+
+        .toast.error {
+            background: #e53935;
+        }
+
+        .toast.info {
+            background: #2196f3;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #95a5a6;
+            padding: 40px;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .empty-state-hint {
+            font-size: 0.9rem;
+        }
+
+        /* 自动保存指示器 */
+        .autosave-indicator {
+            font-size: 0.85rem;
+            color: #95a5a6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 复选框样式 */
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1024px) {
+            .file-browser {
+                width: 250px;
+            }
+
+            .preview-pane {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .file-browser {
+                display: none;
+            }
+
+            .navbar {
+                padding: 10px 15px;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <div class="navbar-brand">📝 软件著作权申请材料生成系统</div>
+        <div class="navbar-actions">
+            <button class="btn btn-secondary" onclick="goHome()">🏠 返回首页</button>
+        </div>
+    </nav>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 左侧文件浏览器 -->
+        <div class="file-browser">
+            <div class="file-browser-header">
+                <div class="file-browser-title">📁 项目文档</div>
+                <div class="file-actions">
+                    <button class="btn btn-primary btn-sm" onclick="selectAllFiles()">☑️ 全选</button>
+                    <button class="btn btn-secondary btn-sm" onclick="openFile()">📂 打开</button>
+                </div>
+            </div>
+            <div class="file-list" id="fileList">
+                <!-- 文件列表将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 编辑区域 -->
+        <div class="editor-area">
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <div class="toolbar-group">
+                    <div class="autosave-indicator" id="autosaveIndicator">
+                        <span>✓</span> 已保存
+                    </div>
+                </div>
+                <div class="toolbar-group">
+                    <button class="btn btn-secondary" onclick="saveDocument()">💾 保存</button>
+                    <div class="toolbar-separator"></div>
+                    <button class="btn btn-secondary" onclick="showSaveAsModal()">📥 另存为</button>
+                    <button class="btn btn-primary" onclick="showExportModal()">📤 导出</button>
+                    <button class="btn btn-secondary" onclick="previewDocument()">👁️ 预览</button>
+                    <button class="btn btn-success" onclick="showShareModal()">🔗 分享</button>
+                </div>
+            </div>
+
+            <!-- 编辑内容 -->
+            <div class="editor-content" id="editorContent">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-icon">📄</div>
+                    <div class="empty-state-text">请从左侧选择一个文档</div>
+                    <div class="empty-state-hint">或者点击"打开"按钮浏览文件</div>
+                </div>
+
+                <div class="editor-pane" id="editorPane" style="display: none;">
+                    <textarea class="editor-textarea" id="editorTextarea" placeholder="选择文档后开始编辑..."></textarea>
+                </div>
+
+                <div class="preview-pane" id="previewPane" style="display: none;">
+                    <div class="preview-header">📖 实时预览</div>
+                    <div class="preview-content" id="previewContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 保存模态框 -->
+    <div class="modal" id="saveAsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📥 另存为</div>
+                <button class="modal-close" onclick="closeSaveAsModal()">×</button>
+            </div>
+            <div class="form-group">
+                <label>文件名</label>
+                <input type="text" id="saveAsFilename" placeholder="输入文件名">
+            </div>
+            <div class="form-group">
+                <label>保存格式</label>
+                <select id="saveAsFormat">
+                    <option value="md">Markdown (.md)</option>
+                    <option value="txt">文本文件 (.txt)</option>
+                    <option value="html">HTML文件 (.html)</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="saveDocumentAs()">
+                💾 保存文件
+            </button>
+        </div>
+    </div>
+
+    <!-- 导出模态框 -->
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📤 导出文档</div>
+                <button class="modal-close" onclick="closeExportModal()">×</button>
+            </div>
+            <p style="color: #666; margin-bottom: 20px;">选择导出格式：</p>
+            <div class="export-options">
+                <div class="export-option selected" onclick="selectExportFormat('zip')">
+                    <div class="export-icon">📦</div>
+                    <div>ZIP压缩包</div>
+                    <small>所有文档打包下载</small>
+                </div>
+                <div class="export-option" onclick="selectExportFormat('pdf')">
+                    <div class="export-icon">📄</div>
+                    <div>PDF文档</div>
+                    <small>适合打印和提交</small>
+                </div>
+                <div class="export-option" onclick="selectExportFormat('markdown')">
+                    <div class="export-icon">📝</div>
+                    <div>Markdown</div>
+                    <small>单个文档下载</small>
+                </div>
+                <div class="export-option" onclick="selectExportFormat('all-md')">
+                    <div class="export-icon">📚</div>
+                    <div>全部Markdown</div>
+                    <small>下载所有文档</small>
+                </div>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="exportDocuments()">
+                ✅ 确认导出
+            </button>
+        </div>
+    </div>
+
+    <!-- 分享模态框 -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🔗 分享项目</div>
+                <button class="modal-close" onclick="closeShareModal()">×</button>
+            </div>
+            <p style="color: #666; margin-bottom: 15px;">复制以下链接分享给其他人：</p>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <div id="shareLinkText" style="word-break: break-all; color: #2c3e50;">正在生成链接...</div>
+            </div>
+            <input type="text" id="shareLinkInput" readonly style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 15px;">
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" style="flex: 1;" onclick="copyShareLink()">
+                    📋 复制链接
+                </button>
+                <button class="btn btn-secondary" style="flex: 1;" onclick="shareViaEmail()">
+                    ✉️ 邮件分享
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示信息 -->
+    <div class="toast" id="toast"></div>
+
+    <!-- 文件上传 -->
+    <input type="file" id="fileInput" multiple accept=".md,.txt,.html,.pdf" style="display: none;" onchange="handleFileUpload(event)">
+
+    <script>
+        // 全局变量
+        let projectId = '{{ project_id }}';
+        let currentDocument = null;
+        let documents = [];
+        let selectedFiles = new Set();
+        let autoSaveTimer = null;
+        let exportFormat = 'zip';
+
+        /**
+         * 初始化页面
+         */
+        async function init() {
+            await loadDocuments();
+        }
+
+        /**
+         * 加载文档列表
+         */
+        async function loadDocuments() {
+            try {
+                const response = await fetch(`/api/projects/${projectId}/documents`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    documents = result.documents;
+                    renderFileList();
+                }
+            } catch (error) {
+                console.error('加载文档列表失败：', error);
+                showToast('加载文档列表失败', 'error');
+            }
+        }
+
+        /**
+         * 渲染文件列表
+         */
+        function renderFileList() {
+            const listContainer = document.getElementById('fileList');
+            listContainer.innerHTML = '';
+
+            if (documents.length === 0) {
+                listContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #95a5a6;">暂无文档</div>';
+                return;
+            }
+
+            documents.forEach((doc, index) => {
+                const item = document.createElement('div');
+                item.className = 'file-item' + (currentDocument === doc.name ? ' active' : '') + (selectedFiles.has(doc.name) ? ' selected' : '');
+                item.onclick = () => handleFileClick(doc.name, event);
+                
+                item.innerHTML = `
+                    <input type="checkbox" class="file-checkbox" ${selectedFiles.has(doc.name) ? 'checked' : ''} onclick="handleCheckboxClick('${doc.name}', event)">
+                    <div class="file-name">📄 ${doc.name}</div>
+                    <div class="file-meta">${formatFileSize(doc.size)} | ${doc.modified}</div>
+                `;
+                
+                listContainer.appendChild(item);
+            });
+        }
+
+        /**
+         * 处理文件点击
+         */
+        async function handleFileClick(filename, event) {
+            // 如果点击的是复选框，不处理
+            if (event.target.classList.contains('file-checkbox')) {
+                return;
+            }
+
+            // 如果按住Ctrl/Cmd键，支持多选
+            if (event.ctrlKey || event.metaKey) {
+                if (selectedFiles.has(filename)) {
+                    selectedFiles.delete(filename);
+                } else {
+                    selectedFiles.add(filename);
+                }
+                renderFileList();
+            } else {
+                // 单击打开文档
+                await openDocument(filename);
+            }
+        }
+
+        /**
+         * 处理复选框点击
+         */
+        function handleCheckboxClick(filename, event) {
+            event.stopPropagation();
+            if (selectedFiles.has(filename)) {
+                selectedFiles.delete(filename);
+            } else {
+                selectedFiles.add(filename);
+            }
+            renderFileList();
+        }
+
+        /**
+         * 全选文件
+         */
+        function selectAllFiles() {
+            if (selectedFiles.size === documents.length) {
+                selectedFiles.clear();
+            } else {
+                documents.forEach(doc => selectedFiles.add(doc.name));
+            }
+            renderFileList();
+        }
+
+        /**
+         * 打开文件浏览器
+         */
+        function openFile() {
+            document.getElementById('fileInput').click();
+        }
+
+        /**
+         * 处理文件上传
+         */
+        async function handleFileUpload(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                showToast(`已选择 ${files.length} 个文件`, 'info');
+            }
+        }
+
+        /**
+         * 打开文档
+         */
+        async function openDocument(filename) {
+            try {
+                const response = await fetch(`/api/projects/${projectId}/documents/${filename}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentDocument = filename;
+                    document.getElementById('emptyState').style.display = 'none';
+                    document.getElementById('editorPane').style.display = 'flex';
+                    document.getElementById('previewPane').style.display = 'flex';
+                    document.getElementById('editorTextarea').value = result.content;
+                    updatePreview();
+                    renderFileList();
+                }
+            } catch (error) {
+                console.error('打开文档失败：', error);
+                showToast('打开文档失败', 'error');
+            }
+        }
+
+        /**
+         * 保存文档
+         */
+        async function saveDocument() {
+            if (!currentDocument) {
+                showToast('请先打开一个文档', 'error');
+                return;
+            }
+
+            const content = document.getElementById('editorTextarea').value;
+            
+            try {
+                const response = await fetch(`/api/projects/${projectId}/documents/${currentDocument}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ content })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('文档保存成功！', 'success');
+                    await loadDocuments();
+                } else {
+                    showToast('保存失败：' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('保存文档失败：', error);
+                showToast('网络错误，请重试', 'error');
+            }
+        }
+
+        /**
+         * 显示另存为模态框
+         */
+        function showSaveAsModal() {
+            if (!currentDocument) {
+                showToast('请先打开一个文档', 'error');
+                return;
+            }
+            document.getElementById('saveAsFilename').value = currentDocument.replace('.md', '');
+            document.getElementById('saveAsModal').style.display = 'flex';
+        }
+
+        /**
+         * 关闭另存为模态框
+         */
+        function closeSaveAsModal() {
+            document.getElementById('saveAsModal').style.display = 'none';
+        }
+
+        /**
+         * 另存为
+         */
+        async function saveDocumentAs() {
+            const filename = document.getElementById('saveAsFilename').value.trim();
+            const format = document.getElementById('saveAsFormat').value;
+            
+            if (!filename) {
+                showToast('请输入文件名', 'error');
+                return;
+            }
+
+            let content = document.getElementById('editorTextarea').value;
+            let fullFilename = filename + '.' + format;
+
+            if (format === 'txt') {
+                // 转换为纯文本
+                content = content.replace(/[#*`\[\]]/g, '');
+            } else if (format === 'html') {
+                // 转换为HTML
+                content = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>${filename}</title>
+    <style>
+        body { font-family: "Microsoft YaHei", sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.8; }
+        h1 { color: #2c3e50; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #667eea; color: white; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+${markdownToHtml(content)}
+</body>
+</html>`;
+            }
+
+            // 创建下载链接
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fullFilename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            closeSaveAsModal();
+            showToast(`文件已保存为 ${fullFilename}`, 'success');
+        }
+
+        /**
+         * 更新预览
+         */
+        function updatePreview() {
+            const content = document.getElementById('editorTextarea').value;
+            const previewContent = document.getElementById('previewContent');
+            previewContent.innerHTML = markdownToHtml(content);
+        }
+
+        /**
+         * Markdown转HTML
+         */
+        function markdownToHtml(markdown) {
+            let html = markdown
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+                .replace(/^- (.*$)/gim, '<li>$1</li>')
+                .replace(/^\d+\. (.*$)/gim, '<li>$1</li>')
+                .replace(/```(\w+)?\n([\s\S]*?)```/gim, '<pre><code>$2</code></pre>')
+                .replace(/`([^`]+)`/gim, '<code>$1</code>')
+                .replace(/---\n/gim, '<hr>')
+                .replace(/\n\n/gim, '</p><p>')
+                .replace(/\n/gim, '<br>');
+            
+            return '<p>' + html + '</p>';
+        }
+
+        /**
+         * 预览文档
+         */
+        function previewDocument() {
+            const previewPane = document.getElementById('previewPane');
+            if (previewPane.style.display === 'none') {
+                previewPane.style.display = 'flex';
+                updatePreview();
+                showToast('预览已开启', 'info');
+            } else {
+                previewPane.style.display = 'none';
+                showToast('预览已关闭', 'info');
+            }
+        }
+
+        /**
+         * 显示导出模态框
+         */
+        function showExportModal() {
+            document.getElementById('exportModal').style.display = 'flex';
+        }
+
+        /**
+         * 关闭导出模态框
+         */
+        function closeExportModal() {
+            document.getElementById('exportModal').style.display = 'none';
+        }
+
+        /**
+         * 选择导出格式
+         */
+        function selectExportFormat(format) {
+            exportFormat = format;
+            document.querySelectorAll('.export-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+        }
+
+        /**
+         * 导出文档
+         */
+        async function exportDocuments() {
+            try {
+                if (exportFormat === 'zip' || exportFormat === 'all-md') {
+                    const response = await fetch(`/api/projects/${projectId}/export`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ format: 'zip' })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        window.location.href = result.download_url;
+                        closeExportModal();
+                        showToast('导出成功！正在下载...', 'success');
+                    } else {
+                        showToast('导出失败：' + result.message, 'error');
+                    }
+                } else if (exportFormat === 'markdown' || exportFormat === 'pdf') {
+                    if (!currentDocument) {
+                        showToast('请先打开一个文档', 'error');
+                        return;
+                    }
+
+                    const content = document.getElementById('editorTextarea').value;
+                    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = currentDocument;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    closeExportModal();
+                    showToast('文档已导出', 'success');
+                }
+            } catch (error) {
+                console.error('导出失败：', error);
+                showToast('导出失败，请重试', 'error');
+            }
+        }
+
+        /**
+         * 显示分享模态框
+         */
+        async function showShareModal() {
+            try {
+                const response = await fetch(`/api/projects/${projectId}/share`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('shareLinkText').textContent = result.share_link;
+                    document.getElementById('shareLinkInput').value = result.share_link;
+                    document.getElementById('shareModal').style.display = 'flex';
+                } else {
+                    showToast('生成分享链接失败', 'error');
+                }
+            } catch (error) {
+                console.error('分享失败：', error);
+                showToast('网络错误，请重试', 'error');
+            }
+        }
+
+        /**
+         * 关闭分享模态框
+         */
+        function closeShareModal() {
+            document.getElementById('shareModal').style.display = 'none';
+        }
+
+        /**
+         * 复制分享链接
+         */
+        function copyShareLink() {
+            const input = document.getElementById('shareLinkInput');
+            input.select();
+            document.execCommand('copy');
+            showToast('链接已复制到剪贴板！', 'success');
+        }
+
+        /**
+         * 邮件分享
+         */
+        function shareViaEmail() {
+            const link = document.getElementById('shareLinkInput').value;
+            const subject = encodeURIComponent('软件著作权申请材料项目分享');
+            const body = encodeURIComponent(`您好！\n\n我分享了一个软件著作权申请材料项目给您。\n\n访问链接：${link}\n\n请查收！`);
+            window.open(`mailto:?subject=${subject}&body=${body}`);
+        }
+
+        /**
+         * 返回首页
+         */
+        function goHome() {
+            window.location.href = '/';
+        }
+
+        /**
+         * 显示提示信息
+         */
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        /**
+         * 格式化文件大小
+         */
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        /**
+         * 自动保存
+         */
+        function scheduleAutoSave() {
+            if (autoSaveTimer) {
+                clearTimeout(autoSaveTimer);
+            }
+
+            const indicator = document.getElementById('autosaveIndicator');
+            indicator.innerHTML = '<span>⏳</span> 正在保存...';
+
+            autoSaveTimer = setTimeout(async () => {
+                await saveDocument();
+                indicator.innerHTML = '<span>✓</span> 已保存';
+            }, 2000);
+        }
+
+        // 事件监听
+        document.getElementById('editorTextarea').addEventListener('input', () => {
+            updatePreview();
+            scheduleAutoSave();
+        });
+
+        // 初始化
+        init();
+    </script>
+</body>
+</html>

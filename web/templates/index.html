@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>软件著作权申请材料生成系统</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* 头部样式 */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* 功能卡片 */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .feature-card p {
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+
+        /* 创建项目表单 */
+        .create-form {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            margin-bottom: 50px;
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group .hint {
+            font-size: 0.8rem;
+            color: #95a5a6;
+            margin-top: 6px;
+        }
+
+        .form-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #eee;
+        }
+
+        .form-section-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .btn-create {
+            width: 100%;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-create:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* 提示信息 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+        }
+
+        .toast.success {
+            background: #43a047;
+        }
+
+        .toast.error {
+            background: #e53935;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>📝 软件著作权申请材料生成系统</h1>
+            <p>快速生成、编辑、导出符合中国版权保护中心要求的申请材料</p>
+        </div>
+
+        <!-- 功能特点 -->
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3>智能生成</h3>
+                <p>自动分析项目信息，智能生成完整的申请材料</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">✏️</div>
+                <h3>在线编辑</h3>
+                <p>强大的在线编辑器，随时修改文档内容</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💾</div>
+                <h3>自动保存</h3>
+                <p>实时保存文档，再也不用担心数据丢失</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📤</div>
+                <h3>一键导出</h3>
+                <p>支持导出PDF、Word、Markdown等多种格式</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔗</div>
+                <h3>便捷分享</h3>
+                <p>一键生成分享链接，方便团队协作</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>响应式设计</h3>
+                <p>完美支持电脑、平板、手机等各种设备</p>
+            </div>
+        </div>
+
+        <!-- 创建项目表单 -->
+        <div class="create-form">
+            <h2 class="form-title">创建新项目</h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="ownerName">著作权人名称 *</label>
+                    <input type="text" id="ownerName" placeholder="个人姓名或公司全称" required>
+                </div>
+                <div class="form-group">
+                    <label for="idType">证件类型 *</label>
+                    <select id="idType">
+                        <option value="身份证">身份证</option>
+                        <option value="营业执照">营业执照</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="softwareName">软件名称 *</label>
+                    <input type="text" id="softwareName" placeholder="软件全称，如：社区服务小程序" required>
+                </div>
+                <div class="form-group">
+                    <label for="version">版本号</label>
+                    <input type="text" id="version" placeholder="如：V1.0" value="V1.0">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">📋 著作权人信息</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="idNumber">证件号码</label>
+                        <input type="text" id="idNumber" placeholder="请输入证件号码">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">联系地址</label>
+                        <input type="text" id="address" placeholder="详细联系地址">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact">联系人</label>
+                        <input type="text" id="contact" placeholder="联系人姓名">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">联系电话</label>
+                        <input type="tel" id="phone" placeholder="联系电话">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">💻 软件信息</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="softwareType">软件类型 *</label>
+                        <select id="softwareType">
+                            <option value="小程序">小程序</option>
+                            <option value="APP">APP</option>
+                            <option value="Web应用">Web应用</option>
+                            <option value="游戏软件">游戏软件</option>
+                            <option value="教育软件">教育软件</option>
+                            <option value="金融软件">金融软件</option>
+                            <option value="人工智能软件">人工智能软件</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="industry">面向领域/行业</label>
+                        <input type="text" id="industry" placeholder="如：社区服务">
+                    </div>
+                    <div class="form-group">
+                        <label for="codeLines">代码行数</label>
+                        <input type="number" id="codeLines" placeholder="如：15000" value="15000">
+                    </div>
+                    <div class="form-group">
+                        <label for="programmingLang">编程语言</label>
+                        <input type="text" id="programmingLang" placeholder="如：JavaScript, TypeScript" value="JavaScript, TypeScript">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="devPurpose">开发目的（限50字）</label>
+                    <textarea id="devPurpose" placeholder="简要说明开发此软件要解决什么问题或满足何种需求"></textarea>
+                    <span class="hint">限50字</span>
+                </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="mainFunctions">软件的主要功能（限200字）</label>
+                    <textarea id="mainFunctions" placeholder="清晰、概括地描述软件为用户提供的核心功能"></textarea>
+                    <span class="hint">限200字</span>
+                </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="techFeatures">技术特点（限100字）</label>
+                    <textarea id="techFeatures" placeholder="简要描述该软件在技术上的创新、特点或优势"></textarea>
+                    <span class="hint">限100字</span>
+                </div>
+            </div>
+
+            <button class="btn-create" onclick="createProject()">🚀 创建项目并开始编辑</button>
+        </div>
+    </div>
+
+    <!-- 提示信息 -->
+    <div class="toast" id="toast"></div>
+
+    <!-- 加载动画 -->
+    <div class="loading" id="loading">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div>正在创建项目...</div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * 显示提示信息
+         */
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        /**
+         * 创建新项目
+         */
+        async function createProject() {
+            const ownerName = document.getElementById('ownerName').value.trim();
+            const softwareName = document.getElementById('softwareName').value.trim();
+            
+            if (!ownerName || !softwareName) {
+                showToast('请填写必填字段（著作权人名称和软件名称）', 'error');
+                return;
+            }
+
+            // 显示加载动画
+            document.getElementById('loading').style.display = 'flex';
+
+            try {
+                const projectData = {
+                    owner_name: ownerName,
+                    software_name: softwareName,
+                    software_short_name: softwareName.substring(0, 10),
+                    id_type: document.getElementById('idType').value,
+                    version: document.getElementById('version').value || 'V1.0',
+                    id_number: document.getElementById('idNumber').value,
+                    address: document.getElementById('address').value,
+                    contact: document.getElementById('contact').value,
+                    phone: document.getElementById('phone').value,
+                    software_type: document.getElementById('softwareType').value,
+                    industry: document.getElementById('industry').value,
+                    code_lines: document.getElementById('codeLines').value || '15000',
+                    programming_lang: document.getElementById('programmingLang').value,
+                    dev_purpose: document.getElementById('devPurpose').value,
+                    main_functions: document.getElementById('mainFunctions').value,
+                    tech_features: document.getElementById('techFeatures').value
+                };
+
+                const response = await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(projectData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('项目创建成功！正在跳转到编辑器...', 'success');
+                    setTimeout(() => {
+                        window.location.href = `/editor/${result.project_id}`;
+                    }, 1000);
+                } else {
+                    showToast('项目创建失败：' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('创建项目失败：', error);
+                showToast('网络错误，请重试', 'error');
+            } finally {
+                // 隐藏加载动画
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
