@@ -184,6 +184,26 @@
             transform: none !important;
         }
 
+        .btn-import-template {
+            width: 100%;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3);
+        }
+
+        .btn-import-template:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 239, 125, 0.4);
+        }
+
         /* 提示信息 */
         .toast {
             position: fixed;
@@ -395,6 +415,7 @@
             </div>
 
             <button class="btn-create" onclick="createProject()">🚀 创建项目并开始编辑</button>
+            <button class="btn-import-template" onclick="importTemplate()">📥 导入新项目模板（云南意念科技）</button>
         </div>
     </div>
 
@@ -483,6 +504,49 @@
             } finally {
                 // 隐藏加载动画
                 document.getElementById('loading').style.display = 'none';
+            }
+        }
+        /**
+         * 导入新项目模板
+         */
+        async function importTemplate() {
+            try {
+                const response = await fetch('/api/template');
+                const result = await response.json();
+                
+                if (!result.success) {
+                    showToast('导入模板失败', 'error');
+                    return;
+                }
+
+                const t = result.template;
+                
+                // 填充表单
+                document.getElementById('ownerName').value = t.owner_name || '';
+                document.getElementById('softwareName').value = t.software_name || '';
+                document.getElementById('version').value = t.version || 'V2.0.0';
+                document.getElementById('idNumber').value = t.id_number || '';
+                document.getElementById('address').value = t.address || '';
+                document.getElementById('contact').value = t.contact || '';
+                document.getElementById('phone').value = t.phone || '';
+                document.getElementById('industry').value = t.industry || '';
+                document.getElementById('devPurpose').value = t.dev_purpose || '';
+                document.getElementById('mainFunctions').value = t.main_functions || '';
+                document.getElementById('techFeatures').value = t.tech_features || '';
+
+                // 设置软件类型
+                const softwareTypeSelect = document.getElementById('softwareType');
+                for (let i = 0; i < softwareTypeSelect.options.length; i++) {
+                    if (softwareTypeSelect.options[i].value === t.software_type) {
+                        softwareTypeSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+
+                showToast('✅ 模板导入成功！请检查并修改表单内容', 'success');
+            } catch (error) {
+                console.error('导入模板失败：', error);
+                showToast('网络错误，请重试', 'error');
             }
         }
     </script>
