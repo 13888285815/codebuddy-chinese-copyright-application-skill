@@ -7,7 +7,16 @@
 import os
 import json
 import re
+import subprocess
+import sys
 from pathlib import Path
+
+# 版本号（语义化版本2.0.0）
+try:
+    from version import get_version as _get_ver
+    __version__ = _get_ver()
+except ImportError:
+    __version__ = "2.0.0+202605171048"
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 import subprocess
@@ -71,7 +80,7 @@ class CopyrightDocGenerator:
         )
         self.project_info = {
             "name": "",
-            "version": "1.0.0",
+            "version": "2.0.0",
             "description": "",
             "author": "",
             "type": "未知",
@@ -1198,7 +1207,9 @@ def main():
     """主函数"""
     import argparse
 
-    parser = argparse.ArgumentParser(description="中国软件著作权申请材料生成器")
+    parser = argparse.ArgumentParser(
+        description=f"中国软件著作权申请材料生成器 v{__version__}"
+    )
     parser.add_argument("project_path", help="项目路径")
     parser.add_argument(
         "-o",
@@ -1216,6 +1227,9 @@ def main():
     parser.add_argument(
         "--interactive", "-i", action="store_true", help="交互式输入著作权人和软件信息"
     )
+    parser.add_argument(
+        "-V", "--version", action="version", version=f"%(prog)s {__version__}"
+    )
 
     args = parser.parse_args()
 
@@ -1223,7 +1237,8 @@ def main():
     generator = CopyrightDocGenerator(args.project_path, args.output)
 
     # 分析项目
-    print("\n正在分析项目...")
+    print(f"\n软件著作权申请材料生成器 v{__version__}")
+    print("正在分析项目...")
     generator.analyze_project()
     print(f"项目名称：{generator.project_info['name']}")
     print(f"项目版本：{generator.project_info['version']}")

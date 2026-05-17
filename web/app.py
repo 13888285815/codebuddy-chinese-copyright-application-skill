@@ -14,6 +14,14 @@ from datetime import datetime
 from pathlib import Path
 from werkzeug.utils import secure_filename
 
+# 版本号（语义化版本2.0.0）
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+try:
+    from version import get_version as _get_ver
+    __version__ = _get_ver()
+except ImportError:
+    __version__ = "2.0.0+202605171048"
+
 from flask import (
     Flask, render_template, request, jsonify,
     send_file, session, redirect, url_for
@@ -124,7 +132,7 @@ def 获取项目列表():
 
     # 按更新时间倒序排列
     项目列表.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
-    return jsonify({"success": True, "projects": 项目列表})
+    return jsonify({"success": True, "projects": 项目列表, "version": __version__})
 
 
 @应用.route("/api/projects", methods=["POST"])
