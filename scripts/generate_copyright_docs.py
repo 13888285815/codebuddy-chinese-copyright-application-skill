@@ -16,7 +16,7 @@ try:
     from version import get_version as _get_ver
     __version__ = _get_ver()
 except ImportError:
-    __version__ = "2.0.0+202605171048"
+    __version__ = get_version()
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 import subprocess
