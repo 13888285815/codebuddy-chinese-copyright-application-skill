@@ -96,9 +96,9 @@ def 首页():
 
 
 @应用.route("/editor/<project_id>")
-def 编辑器(项目编号):
+def 编辑器(project_id):
     """渲染编辑器页面"""
-    return render_template("editor.html", project_id=项目编号)
+    return render_template("editor.html", project_id=project_id)
 
 
 # ============================================================
@@ -119,7 +119,7 @@ def 获取项目列表():
         if not os.path.isdir(项目路径):
             continue
 
-        数据 = 读取项目数据(项目编号)
+        数据 = 读取项目数据(project_id)
         if 数据:
             项目列表.append({
                 "id": 项目编号,
@@ -189,18 +189,18 @@ def 获取模板():
 
 
 @应用.route("/api/projects/<project_id>", methods=["GET"])
-def 获取项目(项目编号):
+def 获取项目(project_id):
     """获取项目配置数据"""
-    数据 = 读取项目数据(项目编号)
+    数据 = 读取项目数据(project_id)
     if not 数据:
         return jsonify({"success": False, "message": "项目不存在"}), 404
     return jsonify({"success": True, "data": 数据})
 
 
 @应用.route("/api/projects/<project_id>", methods=["DELETE"])
-def 删除项目(项目编号):
+def 删除项目(project_id):
     """删除项目及其所有文件"""
-    项目目录 = 获取项目目录(项目编号)
+    项目目录 = 获取项目目录(project_id)
     if not os.path.exists(项目目录):
         return jsonify({"success": False, "message": "项目不存在"}), 404
 
@@ -353,9 +353,9 @@ def 上传项目分析():
 
 
 @应用.route("/api/projects/<project_id>/documents", methods=["GET"])
-def 获取文档列表(项目编号):
+def 获取文档列表(project_id):
     """获取项目下所有文档"""
-    项目目录 = 获取项目目录(项目编号)
+    项目目录 = 获取项目目录(project_id)
     if not os.path.exists(项目目录):
         return jsonify({"success": False, "message": "项目不存在"}), 404
 
@@ -386,14 +386,14 @@ def 获取文档列表(项目编号):
 
 
 @应用.route("/api/projects/<project_id>/documents/<filename>", methods=["GET"])
-def 获取文档内容(项目编号, 文件名):
+def 获取文档内容(project_id, 文件名):
     """获取单个文档内容"""
     实际文件名 = 内部名映射.get(文件名, 文件名)
-    文件路径 = os.path.join(获取项目目录(项目编号), 实际文件名)
+    文件路径 = os.path.join(获取项目目录(project_id), 实际文件名)
 
     # 如果映射名不存在，尝试直接查找
     if not os.path.exists(文件路径):
-        文件路径 = os.path.join(获取项目目录(项目编号), 文件名)
+        文件路径 = os.path.join(获取项目目录(project_id), 文件名)
 
     if not os.path.exists(文件路径):
         return jsonify({"success": False, "message": "文档不存在"}), 404
@@ -405,24 +405,24 @@ def 获取文档内容(项目编号, 文件名):
 
 
 @应用.route("/api/projects/<project_id>/documents/<filename>", methods=["PUT"])
-def 更新文档内容(项目编号, 文件名):
+def 更新文档内容(project_id, 文件名):
     """更新文档内容"""
     实际文件名 = 内部名映射.get(文件名, 文件名)
     数据 = request.json
-    文件路径 = os.path.join(获取项目目录(项目编号), 实际文件名)
+    文件路径 = os.path.join(获取项目目录(project_id), 实际文件名)
 
     # 如果映射名不存在，尝试直接查找
     if not os.path.exists(文件路径):
-        文件路径 = os.path.join(获取项目目录(项目编号), 文件名)
+        文件路径 = os.path.join(获取项目目录(project_id), 文件名)
 
     with open(文件路径, "w", encoding="utf-8") as f:
         f.write(数据.get("content", ""))
 
     # 更新项目修改时间
-    项目数据 = 读取项目数据(项目编号)
+    项目数据 = 读取项目数据(project_id)
     if 项目数据:
         项目数据["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        保存项目数据(项目编号, 项目数据)
+        保存项目数据(project_id, 项目数据)
 
     return jsonify({"success": True, "message": "文档保存成功"})
 
@@ -432,9 +432,9 @@ def 更新文档内容(项目编号, 文件名):
 # ============================================================
 
 @应用.route("/api/projects/<project_id>/export", methods=["POST"])
-def 导出项目(项目编号):
+def 导出项目(project_id):
     """将项目文档打包为zip导出"""
-    项目目录 = 获取项目目录(项目编号)
+    项目目录 = 获取项目目录(project_id)
     if not os.path.exists(项目目录):
         return jsonify({"success": False, "message": "项目不存在"}), 404
 
@@ -471,12 +471,12 @@ def 下载文件(文件名):
 
 
 @应用.route("/api/projects/<project_id>/export-pdf", methods=["POST"])
-def 导出PDF(项目编号):
+def 导出PDF(project_id):
     """
     将文档转换为PDF格式
     尝试使用系统安装的转换工具（pandoc 或 wkhtmltopdf）
     """
-    项目目录 = 获取项目目录(项目编号)
+    项目目录 = 获取项目目录(project_id)
     if not os.path.exists(项目目录):
         return jsonify({"success": False, "message": "项目不存在"}), 404
 
@@ -531,10 +531,10 @@ def 导出PDF(项目编号):
 
 
 @应用.route("/api/download-pdf/<project_id>/<filename>", methods=["GET"])
-def 下载PDF(项目编号, 文件名):
+def 下载PDF(project_id, 文件名):
     """下载生成的PDF文件"""
     实际文件名 = 文件名.replace(".pdf", ".md")
-    pdf路径 = os.path.join(获取项目目录(项目编号), 实际文件名).replace(".md", ".pdf")
+    pdf路径 = os.path.join(获取项目目录(project_id), 实际文件名).replace(".md", ".pdf")
 
     if not os.path.exists(pdf路径):
         return jsonify({"success": False, "message": "PDF文件不存在"}), 404
@@ -547,9 +547,9 @@ def 下载PDF(项目编号, 文件名):
 # ============================================================
 
 @应用.route("/api/projects/<project_id>/share", methods=["POST"])
-def 分享项目(项目编号):
+def 分享项目(project_id):
     """生成项目分享链接"""
-    项目目录 = 获取项目目录(项目编号)
+    项目目录 = 获取项目目录(project_id)
     if not os.path.exists(项目目录):
         return jsonify({"success": False, "message": "项目不存在"}), 404
 
