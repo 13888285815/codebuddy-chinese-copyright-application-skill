@@ -329,43 +329,55 @@ class CopyrightDocGenerator:
                         }
                     )
 
-        # 按重要性排序
-        self._sort_code_files()
+        # 按优先级排序
+        self.code_files.sort(key=lambda x: self._file_priority(x["path"]))
 
-    def _sort_code_files(self):
-        """按重要性排序代码文件"""
-        # 重要性关键词
-        important_keywords = [
-            "app",
-            "main",
-            "index",
-            "router",
-            "api",
-            "service",
-            "controller",
-            "model",
-        ]
+    def _file_priority(self, file_path: str) -> int:
+        """计算文件优先级（数字越小优先级越高）"""
+        path = Path(file_path)
+        filename = path.name.lower()
 
-        def get_importance(file_info):
-            path = file_info["path"].lower()
-            score = 0
+        # 入口文件最高优先级
+        if filename in [
+            "app.js", "main.js", "index.js",
+            "app.py", "main.py", "index.py",
+            "app.ts", "main.ts", "index.ts",
+        ]:
+            return 0
 
-            # 关键词加分
-            for keyword in important_keywords:
-                if keyword in path:
-                    score += 10
+        # 配置文件
+        if filename in ["config.js", "config.py", "settings.py", "configuration.py"]:
+            return 5
 
-            # 核心文件加分
-            if "app.js" in path or "app.ts" in path or "main.js" in path:
-                score += 20
+        # 路由/控制器
+        if "router" in str(path) or "route" in str(path) or "controller" in str(path):
+            return 10
 
-            # 配置文件减分
-            if "config" in path or "test" in path or "spec" in path:
-                score -= 5
+        # 工具函数
+        if "utils" in str(path) or "helpers" in str(path) or "tools" in str(path):
+            return 15
 
-            return -score  # 负数使重要的排在前面
+        # 页面/组件
+        if "pages" in str(path) or "components" in str(path) or "views" in str(path):
+            return 20
 
-        self.code_files.sort(key=get_importance)
+        # 模型/数据
+        if "model" in str(path) or "schema" in str(path) or "entity" in str(path):
+            return 25
+
+        # 服务层
+        if "service" in str(path) or "api" in str(path):
+            return 30
+
+        # 配置目录
+        if "config" in str(path):
+            return 40
+
+        # 测试文件最低优先级
+        if "test" in str(path) or "spec" in str(path):
+            return 100
+
+        return 50
 
     def _analyze_structure(self):
         """分析项目结构"""
@@ -429,6 +441,10 @@ class CopyrightDocGenerator:
         self.generate_design_doc(
             owner_info["name"] if owner_info else "", software_info
         )
+
+        # 尝试转换为PDF
+        self.log("尝试转换为PDF...")
+        self.convert_to_pdf()
 
         self.log(f"所有文档已生成到：{self.output_dir}")
 
@@ -1066,6 +1082,117 @@ class CopyrightDocGenerator:
             return ", ".join(self.project_info["tech_stack"][:3])
         return "JavaScript"
 
+    def convert_to_pdf(self):
+        """将生成的Markdown文档转换为PDF"""
+        self.log("开始转换为PDF...")
+
+        has_pandoc = self._check_command("pandoc")
+        has_wkhtmltopdf = self._check_command("wkhtmltopdf")
+
+        if not has_pandoc and not has_wkhtmltopdf:
+            self.log("未找到PDF转换工具（pandoc或wkhtmltopdf），跳过PDF转换", "WARNING")
+            return
+
+        md_files = [
+            "软件著作权登记申请表.md",
+            "源代码文档.md",
+            "用户手册.md",
+            "设计说明书.md",
+        ]
+
+        for md_file in md_files:
+            md_path = self.output_dir / md_file
+            pdf_path = self.output_dir / md_file.replace(".md", ".pdf")
+
+            if not md_path.exists():
+                self.log(f"文件不存在：{md_path}", "WARNING")
+                continue
+
+            # 优先使用pandoc
+            if has_pandoc:
+                try:
+                    cmd = [
+                        "pandoc",
+                        str(md_path),
+                        "-o",
+                        str(pdf_path),
+                        "--pdf-engine=xelatex",
+                        "-V",
+                        "mainfont=SimSun",
+                        "-V",
+                        "geometry:margin=1in",
+                    ]
+                    subprocess.run(cmd, check=True, capture_output=True)
+                    self.log(f"已生成PDF：{pdf_path}")
+                    continue
+                except subprocess.CalledProcessError as e:
+                    self.log(f"Pandoc转换失败：{e}", "ERROR")
+
+            # 回退到wkhtmltopdf
+            if has_wkhtmltopdf:
+                self._convert_with_wkhtmltopdf(md_path, pdf_path)
+
+    def _check_command(self, command: str) -> bool:
+        """检查系统命令是否存在"""
+        try:
+            subprocess.run(
+                ["which", command], check=True, capture_output=True
+            )
+            return True
+        except subprocess.CalledProcessError:
+            return False
+
+    def _convert_with_wkhtmltopdf(self, md_path: Path, pdf_path: Path):
+        """使用wkhtmltopdf转换PDF"""
+        try:
+            html_path = md_path.with_suffix(".html")
+            with open(md_path, "r", encoding="utf-8") as f:
+                md_content = f.read()
+
+            html_content = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{md_path.stem}</title>
+    <style>
+        body {{ font-family: SimSun, serif; margin: 20px; line-height: 1.8; }}
+        h1 {{ color: #333; }}
+        h2 {{ color: #555; }}
+        table {{ border-collapse: collapse; width: 100%; }}
+        th, td {{ border: 1px solid #ccc; padding: 8px; text-align: left; }}
+        code {{ background-color: #f4f4f4; padding: 2px 4px; }}
+        pre {{ background-color: #f4f4f4; padding: 10px; overflow-x: auto; }}
+    </style>
+</head>
+<body>
+{self._md_to_html_simple(md_content)}
+</body>
+</html>"""
+
+            with open(html_path, "w", encoding="utf-8") as f:
+                f.write(html_content)
+
+            subprocess.run(
+                ["wkhtmltopdf", str(html_path), str(pdf_path)],
+                check=True,
+                capture_output=True,
+            )
+            html_path.unlink()
+            self.log(f"已生成PDF：{pdf_path}")
+        except Exception as e:
+            self.log(f"wkhtmltopdf转换失败：{e}", "ERROR")
+
+    def _md_to_html_simple(self, md_content: str) -> str:
+        """简易Markdown到HTML转换"""
+        html = md_content
+        html = re.sub(r"^# (.+)$", r"<h1>\1</h1>", html, flags=re.MULTILINE)
+        html = re.sub(r"^## (.+)$", r"<h2>\2</h2>", html, flags=re.MULTILINE)
+        html = re.sub(r"^### (.+)$", r"<h3>\3</h3>", html, flags=re.MULTILINE)
+        html = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", html)
+        html = re.sub(r"^- (.+)$", r"<li>\1</li>", html, flags=re.MULTILINE)
+        html = re.sub(r"^([^<].+)$", r"<p>\1</p>", html, flags=re.MULTILINE)
+        return html
+
 
 def main():
     """主函数"""
@@ -1138,8 +1265,19 @@ def main():
     print(f"  - 源代码文档.md")
     print(f"  - 用户手册.md")
     print(f"  - 设计说明书.md")
-    print("\n如需转换为PDF，请运行：")
-    print(f"  python3 scripts/convert_to_pdf.py {generator.output_dir}")
+    # 尝试转换为PDF
+    print("\n正在转换为PDF...")
+    generator.convert_to_pdf()
+
+    print("\n" + "=" * 60)
+    print("申请材料生成完成！")
+    print("=" * 60)
+    print(f"输出目录：{generator.output_dir}")
+    print("生成的文件：")
+    print("  - 软件著作权登记申请表.md")
+    print("  - 源代码文档.md")
+    print("  - 用户手册.md")
+    print("  - 设计说明书.md")
     print("=" * 60)
 
 
