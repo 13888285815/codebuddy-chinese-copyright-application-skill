@@ -11,16 +11,16 @@ import subprocess
 import sys
 from pathlib import Path
 
-# 版本号（语义化版本2.0.0）
+# 版本号（基于Git标签自动生成）
 try:
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from version import get_version as _get_ver
     __version__ = _get_ver()
-except ImportError:
-    __version__ = get_version()
+except Exception:
+    __version__ = "2.0.0"
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 import subprocess
-import sys
 
 
 def collect_copyright_owner_info() -> Dict:
