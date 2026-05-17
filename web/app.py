@@ -386,14 +386,14 @@ def 获取文档列表(project_id):
 
 
 @应用.route("/api/projects/<project_id>/documents/<filename>", methods=["GET"])
-def 获取文档内容(project_id, 文件名):
+def 获取文档内容(project_id, filename):
     """获取单个文档内容"""
-    实际文件名 = 内部名映射.get(文件名, 文件名)
+    实际文件名 = 内部名映射.get(filename, filename)
     文件路径 = os.path.join(获取项目目录(project_id), 实际文件名)
 
     # 如果映射名不存在，尝试直接查找
     if not os.path.exists(文件路径):
-        文件路径 = os.path.join(获取项目目录(project_id), 文件名)
+        文件路径 = os.path.join(获取项目目录(project_id), filename)
 
     if not os.path.exists(文件路径):
         return jsonify({"success": False, "message": "文档不存在"}), 404
@@ -401,19 +401,19 @@ def 获取文档内容(project_id, 文件名):
     with open(文件路径, "r", encoding="utf-8") as f:
         内容 = f.read()
 
-    return jsonify({"success": True, "content": 内容, "filename": 文件名})
+    return jsonify({"success": True, "content": 内容, "filename": filename})
 
 
 @应用.route("/api/projects/<project_id>/documents/<filename>", methods=["PUT"])
-def 更新文档内容(project_id, 文件名):
+def 更新文档内容(project_id, filename):
     """更新文档内容"""
-    实际文件名 = 内部名映射.get(文件名, 文件名)
+    实际文件名 = 内部名映射.get(filename, filename)
     数据 = request.json
     文件路径 = os.path.join(获取项目目录(project_id), 实际文件名)
 
     # 如果映射名不存在，尝试直接查找
     if not os.path.exists(文件路径):
-        文件路径 = os.path.join(获取项目目录(project_id), 文件名)
+        文件路径 = os.path.join(获取项目目录(project_id), filename)
 
     with open(文件路径, "w", encoding="utf-8") as f:
         f.write(数据.get("content", ""))
@@ -438,7 +438,7 @@ def 导出项目(project_id):
     if not os.path.exists(项目目录):
         return jsonify({"success": False, "message": "项目不存在"}), 404
 
-    压缩文件名 = f"copyright-materials-{项目编号[:8]}.zip"
+    压缩文件名 = f"copyright-materials-{project_id[:8]}.zip"
     压缩路径 = os.path.join(应用.config["GENERATED_FOLDER"], 压缩文件名)
 
     with zipfile.ZipFile(压缩路径, "w", zipfile.ZIP_DEFLATED) as zf:
@@ -451,7 +451,7 @@ def 导出项目(project_id):
                 压缩名 = 显示名映射.get(file, file)
                 zf.write(文件路径, 压缩名)
 
-    下载名 = f"软件著作权申请材料-{项目编号[:8]}.zip"
+    下载名 = f"软件著作权申请材料-{project_id[:8]}.zip"
     return jsonify({
         "success": True,
         "download_url": f"/api/download/{压缩文件名}",
@@ -460,13 +460,13 @@ def 导出项目(project_id):
 
 
 @应用.route("/api/download/<filename>", methods=["GET"])
-def 下载文件(文件名):
+def 下载文件(filename):
     """下载指定文件"""
-    文件路径 = os.path.join(应用.config["GENERATED_FOLDER"], secure_filename(文件名))
+    文件路径 = os.path.join(应用.config["GENERATED_FOLDER"], secure_filename(filename))
     if not os.path.exists(文件路径):
         return jsonify({"success": False, "message": "文件不存在"}), 404
 
-    下载名 = 文件名.replace("copyright-materials-", "软件著作权申请材料-")
+    下载名 = filename.replace("copyright-materials-", "软件著作权申请材料-")
     return send_file(文件路径, as_attachment=True, download_name=下载名)
 
 
@@ -514,7 +514,7 @@ def 导出PDF(project_id):
         return jsonify({
             "success": True,
             "message": "PDF生成成功",
-            "pdf_url": f"/api/download-pdf/{项目编号}/{下载名}",
+            "pdf_url": f"/api/download-pdf/{project_id}/{下载名}",
         })
     except FileNotFoundError:
         return jsonify({
@@ -531,15 +531,15 @@ def 导出PDF(project_id):
 
 
 @应用.route("/api/download-pdf/<project_id>/<filename>", methods=["GET"])
-def 下载PDF(project_id, 文件名):
+def 下载PDF(project_id, filename):
     """下载生成的PDF文件"""
-    实际文件名 = 文件名.replace(".pdf", ".md")
+    实际文件名 = filename.replace(".pdf", ".md")
     pdf路径 = os.path.join(获取项目目录(project_id), 实际文件名).replace(".md", ".pdf")
 
     if not os.path.exists(pdf路径):
         return jsonify({"success": False, "message": "PDF文件不存在"}), 404
 
-    return send_file(pdf路径, as_attachment=True, download_name=文件名)
+    return send_file(pdf路径, as_attachment=True, download_name=filename)
 
 
 # ============================================================
@@ -553,7 +553,7 @@ def 分享项目(project_id):
     if not os.path.exists(项目目录):
         return jsonify({"success": False, "message": "项目不存在"}), 404
 
-    分享链接 = f"{request.host_url}editor/{项目编号}"
+    分享链接 = f"{request.host_url}editor/{project_id}"
     return jsonify({"success": True, "share_link": 分享链接})
 
 
