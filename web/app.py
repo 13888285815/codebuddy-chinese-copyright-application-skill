@@ -264,7 +264,7 @@ def 上传项目分析():
         项目数据 = {
             "software_name": 项目信息.get("name", ""),
             "software_short_name": 项目信息.get("name", "").replace("软件", ""),
-            "version": 项目信息.get("version", "1.0.0"),
+            "version": 项目信息.get("version", "2.0.0"),
             "software_type": 项目信息.get("type", "通用软件"),
             "owner_name": 著作权人 or "（请填写）",
             "id_type": 证件类型,
@@ -547,7 +547,7 @@ def 从表单生成文档(项目编号: str, 数据: dict):
     著作权人 = 数据.get("owner_name", "未填写")
     软件名称 = 数据.get("software_name", "示例软件")
     软件简称 = 数据.get("software_short_name", 软件名称[:10])
-    版本号 = 数据.get("version", "V1.0")
+    版本号 = 数据.get("version", "V2.0.0")
     软件类型 = 数据.get("software_type", "小程序")
     证件类型 = 数据.get("id_type", "身份证")
     证件号码 = 数据.get("id_number", "（请填写）")
